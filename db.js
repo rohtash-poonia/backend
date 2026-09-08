@@ -1,15 +1,22 @@
-const mongoose = require("mongoose");
-const { setServers } = require("node:dns/promises");
-setServers(["1.1.1.1", "8.8.8.8"]);
+require("dotenv").config();
 
+const mongoose = require("mongoose");
+const dns = require("node:dns");
+dns.setServers(["1.1.1.1", "1.0.0.1"]);
 const connectdb = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://poonia22704_db_user:admin@firstproject.urna8iv.mongodb.net/backendmain?appName=FirstProject",
-    );
-    console.log(" Database connected");
+    const mongoUrl =
+      process.env.MONGO_URL || "mongodb://127.0.0.1:27017/bkmain";
+
+    await mongoose.connect(mongoUrl, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
+    });
+
+    console.log("Database connected");
   } catch (error) {
-    console.log("error database not connected", error);
+    console.error("Database connection failed:", error.message);
+    console.error("Please check MONGO_URL or start a local MongoDB server.");
   }
 };
 
